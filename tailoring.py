@@ -1,7 +1,7 @@
 import re
 from collections import Counter
 
-STRONG_VERBS = {"led","built","launched","increased","reduced","optimized","designed","implemented","drove","managed"}
+STRONG_VERBS = {"led","built","launched","increased","reduced","optimized","designed","implemented","drove","managed","trained","standardized","improved","streamlined"}
 STOP = set("a an the and or for to of in with on at by from as is are be this that".split())
 
 def tokenize(txt):

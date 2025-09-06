@@ -1,61 +1,49 @@
-# Resume Bot
+# Resume Bot — PythonAnywhere Webhook Build
 
-A Telegram bot that helps you build an ATS-friendly résumé interactively:
-- Collects contact, skills, experience, and education.
-- Helps you write measurable bullet points.
-- Tailors bullets to a pasted job description.
-- Exports clean `.docx` and `.txt` versions.
+This repo is ready to deploy on **PythonAnywhere** using **webhooks** (Flask).
+It still supports local dev via polling (`python main.py`).
 
----
-
-## 🚀 Setup
-
-### 1. Clone this repo
+## Quick start (local)
 ```bash
-git clone https://github.com/<your-username>/resume-bot.git
-cd resume-bot
-```
-
-### 2. Create a virtual environment (recommended)
-```bash
-python3 -m venv .venv
-source .venv/bin/activate   # Mac/Linux
-.venv\Scripts\activate      # Windows
-```
-
-### 3. Install dependencies
-```bash
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-### 4. Set your bot token
-Create a bot with **@BotFather** on Telegram, copy the token, then:
-```bash
-export TELEGRAM_BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11   # Mac/Linux
-setx TELEGRAM_BOT_TOKEN "123456:ABC-DEF..."                          # Windows
-```
-
-### 5. Run the bot
-```bash
+export TELEGRAM_BOT_TOKEN=xxxx:yyyy
 python main.py
 ```
 
----
+## Deploy on PythonAnywhere
+1) Push this repo to GitHub and clone it in a PythonAnywhere Bash console.
+2) Create a venv and install deps:
+```bash
+cd ~/resume-bot
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+3) Web tab → Add new **Flask** app → Python 3.x. Edit the WSGI file to point to this project (see below).
+4) Web tab → Environment variables: set `TELEGRAM_BOT_TOKEN`, `WEBHOOK_SECRET`, `PA_USERNAME`.
+5) Reload the web app.
+6) In Bash (venv activated), run:
+```bash
+python pa_set_webhook.py
+```
+7) DM your bot `/start`.
 
-## 🛠️ Usage
-In Telegram DM with your bot:
+### WSGI snippet (replace <your-username>)
+Edit `/var/www/<your-username>_pythonanywhere_com_wsgi.py`:
+```python
+import sys, os
+path = '/home/<your-username>/resume-bot'  # repo folder
+if path not in sys.path:
+    sys.path.append(path)
 
-- `/contact` → enter name, email, phone, etc.
-- `/experience` → add roles & bullets (with `/done` to finish a job)
-- `/skills` → add core skills, tools, certs
-- `/education` → add education
-- `/summary` → add your professional summary
-- `/tailor` → paste a job description, get bullet suggestions
-- `/export` → get `resume.docx` and `resume.txt`
+activate_this = '/home/<your-username>/resume-bot/.venv/bin/activate_this.py'
+with open(activate_this) as f:
+    exec(f.read(), {'__file__': activate_this})
 
----
+from pa_web import application
+```
 
-## 📌 Next Features
-- Multiple résumé templates
-- LinkedIn import (PDF → parsed)
-- Named résumé variants
+### Notes
+- Free PA plan may block outbound to `api.telegram.org`; paid plan recommended for bots.
+- Change `WEBHOOK_SECRET` if you want a new endpoint path, then rerun `pa_set_webhook.py`.
